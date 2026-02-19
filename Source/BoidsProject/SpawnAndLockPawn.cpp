@@ -2,6 +2,7 @@
 
 
 #include "SpawnAndLockPawn.h"
+#include "Boid.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Components/StaticMeshComponent.h"
@@ -171,7 +172,7 @@ void ASpawnAndLockPawn::OnSpawnBoidReleased()
 	PreviewCubeMesh->SetVisibility(false);
 
 	// 실제 Boid 스폰
-	if (CurrentHitLocation.IsZero())
+	if (!CurrentHitLocation.IsZero())
 	{
 		SpawnBoidAtLocation(CurrentHitLocation);
 	}
@@ -210,7 +211,7 @@ void ASpawnAndLockPawn::UpdateRaycast()
 	{
 		// 히트한 경우 : 표면에서 약간 떨어진 곳에 배치
 		// 노멀 벡터 방향으로 오프셋 적용
-		SpawnLocation = HitResult.Location + (HitResult.Normal * SpawnoffSetDistance);
+		SpawnLocation = HitResult.Location + (HitResult.Normal * SpawnOffsetDistance);
 
 		// 디버그 그리기
 		DrawDebugSphere(GetWorld(), HitResult.Location, 15.0f, 12, FColor::Red, false, 0.0f);
@@ -248,11 +249,20 @@ void ASpawnAndLockPawn::SpawnBoidAtLocation(const FVector& Location)
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AActor* SpawnedBoid = GetWorld()->SpawnActor<AActor>(BoidClass, Location, FRotator::ZeroRotator, SpawnParams);
+	AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(BoidClass, Location, FRotator::ZeroRotator, SpawnParams);
 
-	if (SpawnedBoid)
+	if (SpawnedActor)
 	{
+		// Actor를 ABoid로 캐스팅하여 초기 속도 설정.
+		// Cast<ABoid>: 안전한 타입 변환 체크, 실패하면 nullptr 반환.
+		// 카메라가 바라보는 방향으로 초기 속도를 부여한다.
+		ABoid* SpawnedBoid = Cast<ABoid>(SpawnedActor);
+		if (SpawnedBoid)
+		{
+			// 카메라의 Foward 방햐야 * 초기 속도
+			FVector InitalVelocity = CameraComponent->GetForwardVector() * BoidInitialSpeed;
+			SpawnedBoid->InitializeBoid(InitalVelocity);
+		}
 		UE_LOG(LogTemp, Log, TEXT("Boid 스폰 성공: %s"), *Location.ToString());
 	}
 }
-

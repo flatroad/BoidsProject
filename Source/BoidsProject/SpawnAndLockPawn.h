@@ -12,6 +12,7 @@ class UInputAction;
 class UCameraComponent;
 class UFloatingPawnMovement;
 class UStaticMeshComponent;
+class ABoid;
 
 UCLASS()
 class BOIDSPROJECT_API ASpawnAndLockPawn : public APawn
@@ -33,7 +34,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// Components
+
+	//////////////////////////////////////////////////////////////////////////
+	// 컴포넌트
+	//////////////////////////////////////////////////////////////////////////
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* CameraComponent;
@@ -44,7 +49,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Preview")
 	UStaticMeshComponent* PreviewCubeMesh;
 
+
+	//////////////////////////////////////////////////////////////////////////
 	// Enhanced Input
+	//////////////////////////////////////////////////////////////////////////
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* InputMappingContext;
@@ -61,7 +70,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Input")
 	UInputAction* SpawnBoidAction;
 
-	// Input Functions
+
+	//////////////////////////////////////////////////////////////////////////
+	// 입력 처리 함수
+	//////////////////////////////////////////////////////////////////////////
+
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -69,7 +82,11 @@ public:
 	void OnSpawnBoidPressed();
 	void OnSpawnBoidReleased();
 
-	// Movement Settings
+
+	//////////////////////////////////////////////////////////////////////////
+	// 이동 파라미터
+	//////////////////////////////////////////////////////////////////////////
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float MovementSpeed = 1000.0f;
@@ -77,13 +94,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float LookSensitivity = 1.0f;
 
-	// Spawn Settings
+
+	//////////////////////////////////////////////////////////////////////////
+	// 스폰 파라미터
+	//////////////////////////////////////////////////////////////////////////
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	float RaycastDistance = 10000.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
-	float SpawnoffSetDistance = 100.0f;
+	float SpawnOffsetDistance = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	float DefaultSpawnDistance = 2000.0f;
@@ -91,6 +112,10 @@ public:
 	// Boid 클래스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TSubclassOf<AActor> BoidClass;
+
+	// 스폰된 Boid에게 카메라 방향으로 초기 속도를 부여.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	float BoidInitialSpeed = 300.0f;
 
 private:
 	// 레이캐스트 중인지 여부
